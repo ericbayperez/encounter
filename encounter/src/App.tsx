@@ -29,7 +29,13 @@ export default class App extends React.Component {
       <>
         <Grid container spacing={0}>
           <Grid item xs={4} style={{backgroundColor: '#f5f5f5', height:'100vh'}}>
-            {characters.map(character => <CharacterCard character={character}></CharacterCard>)}
+            <div style={{padding: "5px"}}>
+              {characters.map(character =>
+                <div style={{marginBottom: "5px"}}>
+                  <CharacterCard selected={false} character={character}></CharacterCard>
+                </div>
+              )}
+            </div>
           </Grid>
         </Grid>
       </>
