@@ -1,12 +1,11 @@
 import React from 'react';
-import logo from './logo.svg';
 import './App.css';
 import Grid from '@material-ui/core/Grid';
 import Character from './Character';
 import { CharacterCard } from './CharacterCard';
 import CharacterInfo from './CharacterInfo';
 import { library } from '@fortawesome/fontawesome-svg-core'
-import { Fab, Button } from '@material-ui/core';
+import { Fab, Button, Tooltip } from '@material-ui/core';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faPlus, faSortAmountDown, faArrowCircleRight, faArrowRight, faHeart, faShieldAlt, faUser, faDiceD20, faExclamationTriangle} from '@fortawesome/free-solid-svg-icons'
 
@@ -171,7 +170,7 @@ export default class App extends React.Component<{}, AppState>{
     return (
       <>
         <Grid container spacing={0}>
-          <Grid item xs={5} style={{backgroundColor: '#f5f5f5', height:'100vh'}}>
+          <Grid item sm={5} xs={12} className="characterlist">
             <div style={{paddingRight: "5px", paddingTop: "5px", paddingBottom: "5px"}}>
               {this.state.characters.map(character =>
                 <div key={character.id} style={{marginBottom: "10px"}} onClick={() => this.onCharacterSelected(character.id)}>
@@ -179,31 +178,37 @@ export default class App extends React.Component<{}, AppState>{
                 </div>
               )}
             </div>
-            <Grid container spacing={0} direction="row" justify="center">
-              <Grid item xs={2} direction="row">
+            <Grid container spacing={2} direction="row" justify="center">
+              <Grid item sm={3} md={2} direction="row">
                 <div style={{display: "flex", justifyContent: "center"}}>
-                  <Fab color="primary" onClick={this.onNewCharacterClick}>
-                    <FontAwesomeIcon icon="plus"></FontAwesomeIcon> 
-                  </Fab>
+                  <Tooltip title="New Character">
+                    <Fab color="primary" onClick={this.onNewCharacterClick}>
+                      <FontAwesomeIcon icon="plus"></FontAwesomeIcon> 
+                    </Fab>
+                  </Tooltip>
                 </div>
               </Grid>
-              <Grid item xs={2} direction="row">
+              <Grid item sm={3} md={2} direction="row">
                 <div style={{display: "flex", justifyContent: "center"}}>
-                  <Fab color="primary" onClick={this.orderByInitiative}>
-                    <FontAwesomeIcon icon="sort-amount-down"></FontAwesomeIcon> 
-                  </Fab>
+                  <Tooltip title="Order By Initiative">
+                    <Fab color="primary" onClick={this.orderByInitiative}>
+                      <FontAwesomeIcon icon="sort-amount-down"></FontAwesomeIcon> 
+                    </Fab>
+                  </Tooltip>
                 </div>
               </Grid>
-              <Grid item xs={2} direction="row">
+              <Grid item sm={3} md={2} direction="row">
                 <div style={{display: "flex", justifyContent: "center"}}>
-                  <Fab color="secondary" onClick={this.moveToNextTurn}>
-                    <FontAwesomeIcon icon="arrow-right"></FontAwesomeIcon> 
-                  </Fab>
+                  <Tooltip title="Next Turn">
+                    <Fab color="secondary" onClick={this.moveToNextTurn}>
+                      <FontAwesomeIcon icon="arrow-right"></FontAwesomeIcon> 
+                    </Fab>
+                  </Tooltip>
                 </div>
               </Grid>
             </Grid>
           </Grid>
-          <Grid item xs={7} >
+          <Grid item sm={7} xs={12} >
             <div style={{padding: "20px"}}>
               <CharacterInfo character={selectedCharacter} 
                 onNameChange={this.onNameChange}
