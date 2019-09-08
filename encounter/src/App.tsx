@@ -6,11 +6,11 @@ import Character from './Character';
 import { CharacterCard } from './CharacterCard';
 import CharacterInfo from './CharacterInfo';
 import { library } from '@fortawesome/fontawesome-svg-core'
-import { Fab } from '@material-ui/core';
+import { Fab, Button } from '@material-ui/core';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faPlus, faSortAmountDown } from '@fortawesome/free-solid-svg-icons'
+import { faPlus, faSortAmountDown, faArrowCircleRight, faArrowRight, faHeart, faShieldAlt, faUser, faDiceD20, faExclamationTriangle} from '@fortawesome/free-solid-svg-icons'
 
-library.add(faPlus, faSortAmountDown);
+library.add(faPlus, faSortAmountDown, faArrowCircleRight, faArrowRight, faHeart, faShieldAlt, faUser, faDiceD20, faExclamationTriangle);
 
 //WHEN YOU GET RID OF THIS, MAKE SURE YOU START THE STATE OUT WITH AN EMPTY CHARACTER
 let sampleChars: Character[] = [
@@ -23,7 +23,8 @@ let sampleChars: Character[] = [
     isPlayer: true,
     isSelected: true,
     isCurrentTurn: true,
-    initiative: 3
+    initiative: 3,
+    isDisadvantaged: true
   },
   {
     id: 2,
@@ -34,7 +35,8 @@ let sampleChars: Character[] = [
     isPlayer: false,
     isSelected: false,
     isCurrentTurn: false,
-    initiative: 5
+    initiative: 5,
+    isDisadvantaged: false
   }
 ]
 
@@ -73,10 +75,50 @@ export default class App extends React.Component<{}, AppState>{
     this.setState({characters: previousCharacters});
   }
 
+  onCurrentHealthChange = (e: any) => {
+    let previousCharacters = [...this.state.characters];
+    let character = {...previousCharacters[this.state.selectedCharacterIndex]};
+    character.currentHealth = e.target.value;
+    previousCharacters[this.state.selectedCharacterIndex] = character;
+    this.setState({characters: previousCharacters});
+  }
+
   onTotalHealthChange = (e: any) => {
     let previousCharacters = [...this.state.characters];
     let character = {...previousCharacters[this.state.selectedCharacterIndex]};
     character.totalHealth = e.target.value;
+    previousCharacters[this.state.selectedCharacterIndex] = character;
+    this.setState({characters: previousCharacters});
+  }
+
+  onInitiativeChange = (e: any) => {
+    let previousCharacters = [...this.state.characters];
+    let character = {...previousCharacters[this.state.selectedCharacterIndex]};
+    character.initiative = e.target.value;
+    previousCharacters[this.state.selectedCharacterIndex] = character;
+    this.setState({characters: previousCharacters});
+  }
+
+  onIsPlayerChange = (oldIsPlayerValue: boolean) => {
+    let previousCharacters = [...this.state.characters];
+    let character = {...previousCharacters[this.state.selectedCharacterIndex]};
+    character.isPlayer = !oldIsPlayerValue;
+    previousCharacters[this.state.selectedCharacterIndex] = character;
+    this.setState({characters: previousCharacters});
+  }
+
+  onIsDisadvantagedChange = (oldIsDisadvantagedValue: boolean) => {
+    let previousCharacters = [...this.state.characters];
+    let character = {...previousCharacters[this.state.selectedCharacterIndex]};
+    character.isDisadvantaged = !oldIsDisadvantagedValue;
+    previousCharacters[this.state.selectedCharacterIndex] = character;
+    this.setState({characters: previousCharacters});
+  }
+
+  onArmorClassChange = (e: any) => {
+    let previousCharacters = [...this.state.characters];
+    let character = {...previousCharacters[this.state.selectedCharacterIndex]};
+    character.armorClass = e.target.value;
     previousCharacters[this.state.selectedCharacterIndex] = character;
     this.setState({characters: previousCharacters});
   }
@@ -92,7 +134,8 @@ export default class App extends React.Component<{}, AppState>{
       isPlayer: false,
       isSelected: true,
       isCurrentTurn: false,
-      initiative: 0
+      initiative: 0,
+      isDisadvantaged: false
     });
     previousCharacters[this.state.selectedCharacterIndex].isSelected = false;
     this.setState({characters: previousCharacters, selectedCharacterIndex: previousCharacters.length - 1});
@@ -103,7 +146,24 @@ export default class App extends React.Component<{}, AppState>{
     previousCharacters[this.state.selectedCharacterIndex].isSelected = false;
     previousCharacters.sort((a,b) => b.initiative - a.initiative);
     previousCharacters[0].isSelected = true;
+    var currentTurnIndex = previousCharacters.findIndex(character => character.isCurrentTurn === true);
+    previousCharacters[currentTurnIndex].isCurrentTurn = false;
+    previousCharacters[0].isCurrentTurn = true;
     this.setState({characters: previousCharacters, selectedCharacterIndex: 0});
+  }
+
+  moveToNextTurn = () => {
+    let previousCharacters = [...this.state.characters];
+    var currentTurnIndex = previousCharacters.findIndex(character => character.isCurrentTurn === true);
+    previousCharacters[currentTurnIndex].isCurrentTurn = false;
+    previousCharacters[this.state.selectedCharacterIndex].isSelected = false;
+    currentTurnIndex++;
+    if (currentTurnIndex === previousCharacters.length) {
+      currentTurnIndex = 0;
+    }
+    previousCharacters[currentTurnIndex].isCurrentTurn = true;
+    previousCharacters[currentTurnIndex].isSelected = true;
+    this.setState({characters: previousCharacters, selectedCharacterIndex: currentTurnIndex});
   }
 
   render() {
@@ -111,11 +171,11 @@ export default class App extends React.Component<{}, AppState>{
     return (
       <>
         <Grid container spacing={0}>
-          <Grid item xs={4} style={{backgroundColor: '#f5f5f5', height:'100vh'}}>
-            <div style={{padding: "5px"}}>
+          <Grid item xs={5} style={{backgroundColor: '#f5f5f5', height:'100vh'}}>
+            <div style={{paddingRight: "5px", paddingTop: "5px", paddingBottom: "5px"}}>
               {this.state.characters.map(character =>
                 <div key={character.id} style={{marginBottom: "10px"}} onClick={() => this.onCharacterSelected(character.id)}>
-                  <CharacterCard selected={false} character={character}></CharacterCard>
+                  <CharacterCard character={character}></CharacterCard>
                 </div>
               )}
             </div>
@@ -134,13 +194,25 @@ export default class App extends React.Component<{}, AppState>{
                   </Fab>
                 </div>
               </Grid>
+              <Grid item xs={2} direction="row">
+                <div style={{display: "flex", justifyContent: "center"}}>
+                  <Fab color="secondary" onClick={this.moveToNextTurn}>
+                    <FontAwesomeIcon icon="arrow-right"></FontAwesomeIcon> 
+                  </Fab>
+                </div>
+              </Grid>
             </Grid>
           </Grid>
-          <Grid item xs={8} >
+          <Grid item xs={7} >
             <div style={{padding: "20px"}}>
               <CharacterInfo character={selectedCharacter} 
                 onNameChange={this.onNameChange}
                 onTotalHealthChange={this.onTotalHealthChange}
+                onInitiativeChange={this.onInitiativeChange}
+                onIsPlayerChange={this.onIsPlayerChange}
+                onCurrentHealthChange={this.onCurrentHealthChange}
+                onArmorClassChange={this.onArmorClassChange}
+                onIsDisadvantagedChange={this.onIsDisadvantagedChange}
               >
               </CharacterInfo>
             </div>
